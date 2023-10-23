@@ -28,6 +28,7 @@ public class Route {
         this(other.ticketPrice, other.departureCity, other.arrivalCity, other.departureTime, other.arrivalTime);
     }
 
+    // Статический метод для создания экземляра класса через консоль.
     public static Route createFromConsole() {
         Scanner scanner = new Scanner(System.in);
 
@@ -52,6 +53,7 @@ public class Route {
         return new Route(ticketPrice, departureCity, arrivalCity, departureTime, arrivalTime);
     }
 
+    // Метод для печати информации о маршруте.
     public final void printRouteInfo() {
         System.out.println("Маршрут: " + departureCity + " - " + arrivalCity);
         System.out.print("Время взлёта: ");
@@ -69,6 +71,7 @@ public class Route {
         return this.ticketPrice;
     }
 
+    // Метод, сравнивающий маршруты по полям.
     public final boolean equals(Route other) {
         return this.ticketPrice == other.ticketPrice && this.departureCity.equals(other.departureCity)
                 && this.arrivalCity.equals(other.arrivalCity) && this.departureTime.equals(other.departureTime)

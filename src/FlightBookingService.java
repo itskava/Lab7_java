@@ -15,8 +15,8 @@ public class FlightBookingService {
         this.routes = new ArrayList<Route>();
     }
 
-    public FlightBookingService(Account account) { /////////////////////////
-        this.account = account;
+    public FlightBookingService(Account account) {
+        this.account = new Account(account);
         this.routes = new ArrayList<Route>();
     }
 
@@ -24,6 +24,7 @@ public class FlightBookingService {
         return new FlightBookingService(Account.createFromConsole());
     }
 
+    // Метод, распечатывающий информацию обо всех доступных маршрутах.
     public final void printAvailableRoutes() {
         if (!routes.isEmpty()) {
             System.out.println("Доступные маршруты:\n");
@@ -39,14 +40,12 @@ public class FlightBookingService {
         }
     }
 
+    // Метод, распечатывающий информацию об аккаунте.
     public final void printAccountInfo() {
-        System.out.println("Данные аккаунта:");
-        System.out.println("ФИО: " + account.getName());
-        System.out.println("Возраст: " + account.getAge());
-        System.out.println("Почта: " + account.getEmail());
-        System.out.println("Телефон: " + account.getTelephone() + "\n");
+        account.printAccountInfo();
     }
 
+    // Метод, предназначенный для изменения данных аккаунта.
     public void changeAccountInfo(String name, String email, String telephone, int age) {
         account.setName(name);
         account.setEmail(email);
@@ -60,12 +59,14 @@ public class FlightBookingService {
         return account.getBalance();
     }
 
+    // Метод, предназначенный для пополнения баланса аккаунта.
     public void topUpBalance(int amount) {
         account.setBalance(account.getBalance() + amount);
         System.out.println("Ваш баланс успешно пополнен на " + amount + " рублей");
         System.out.println("Теперь он составляет " + account.getBalance() + " рублей.\n");
     }
 
+    // Метод, предназначенный для добавления маршрута.
     public void addRoute(Route route) {
         for (Route rt: routes) {
             if (rt.equals(route)) {
@@ -77,6 +78,7 @@ public class FlightBookingService {
         System.out.println("Маршрут успешно добавлен.");
     }
 
+    // Метод, предназначенный для удаления маршрута.
     public void removeRoute(Route route) {
         for (Route rt: routes) {
             if (rt.equals(route)) {
@@ -89,6 +91,8 @@ public class FlightBookingService {
         System.out.println("Данный маршрут не найден, удаление невозможно.");
     }
 
+    /* Метод, производящий поиск маршрутов по выбранному городу.
+       Выводит список всех доступных городов, город посадки которых совпадает с выбранным. */
     public final void searchTicketsByCity(String desired_city) {
         boolean is_found = false;
         int index = 1;
@@ -110,6 +114,8 @@ public class FlightBookingService {
         }
     }
 
+    /* Метод, производящий поиск маршрутов по заданной цене.
+       Выводит список всех доступных городов, цена билетов которых не превышает заданную. */
     public final void searchTicketsByPrice(int available_money) {
         boolean is_found = false;
         int index = 1;
@@ -131,6 +137,7 @@ public class FlightBookingService {
         }
     }
 
+    // Метод, предназначенный для покупки билетов.
     public void buyTicket(Route route) {
         if (account.getTicket() != null) {
             System.out.println("У Вас уже куплен билет, купить еще один невозможно.\n");
@@ -160,6 +167,7 @@ public class FlightBookingService {
         }
     }
 
+    // Метод, предназначенный для продажи билета.
     public void sellTicket() {
         if (account.getTicket() != null) {
             account.setBalance(account.getBalance() + account.getTicket().getTicketPrice());
@@ -171,6 +179,7 @@ public class FlightBookingService {
         }
     }
 
+    // Метод, распечатывающий информацию о купленном билете.
     public final void printTicketInfo() {
         if (account.getTicket() != null) account.getTicket().printRouteInfo();
         else System.out.println("Билет не куплен, просмотреть информацию невозможно.");

@@ -25,6 +25,7 @@ public class Account {
         this(other.name, other.email, other.telephone, other.age, other.balance);
     }
 
+    // Статический метод для создания экземпляра класса через консоль.
     public static Account createFromConsole() {
         Scanner scanner = new Scanner(System.in);
         String name, email, telephone;
@@ -47,6 +48,15 @@ public class Account {
         scanner.nextLine();
 
         return new Account(name, email, telephone, age, balance);
+    }
+
+    // Метод для печати информации об аккаунте.
+    public final void printAccountInfo() {
+        System.out.println("Данные аккаунта:");
+        System.out.println("ФИО: " + name);
+        System.out.println("Возраст: " + age);
+        System.out.println("Почта: " + email);
+        System.out.println("Телефон: " + telephone + "\n");
     }
 
     public final String getName() {
@@ -97,11 +107,4 @@ public class Account {
         if (route == null) this.ticket = null;
         else this.ticket = new Route(route);
     }
-
-    public final boolean equals(Account other) {
-        return this.name.equals(other.name) && this.email.equals(other.email)
-                && this.telephone.equals(other.telephone) && this.age == other.age
-                && this.balance == other.balance;
-    }
-
 }
