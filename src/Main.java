@@ -1,7 +1,6 @@
-
 public class Main {
     public static void main(String[] args) {
-        TravelService ts = new TravelService(new Account("Timofey Tagaev", "timofey.tagaev.2004.12@gmail.com", "+79293233802", 18, 100000));
+        TravelService ts = new TravelService(new Account("Timofey Tagaev", "timofey.tagaev.2004.12@gmail.com", "+7929323****", 18, 100000));
 
         // Демонстрация работы с массивом объектов.
         Route[] routes = new Route[3];
@@ -35,7 +34,5 @@ public class Main {
         System.out.println(cat);
         cat = cat.toUpperCase(); // Перевод всех символов в верхний регистр
         System.out.println(cat);
-
-
     }
 }
