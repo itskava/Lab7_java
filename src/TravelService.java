@@ -1,27 +1,27 @@
-import java.security.spec.RSAOtherPrimeInfo;
 import java.util.ArrayList;
 
-public class FlightBookingService {
+public class TravelService {
     private ArrayList<Route> routes;
     private Account account;
+    private static long profit;
 
-    public FlightBookingService(String name, String email, String telephone, int age, int balance) {
+    public TravelService(String name, String email, String telephone, int age, int balance) {
         this.account = new Account(name, email, telephone, age, balance);
         this.routes = new ArrayList<Route>();
     }
 
-    public FlightBookingService() {
+    public TravelService() {
         this.account = new Account("", "", "", 0, 0);
         this.routes = new ArrayList<Route>();
     }
 
-    public FlightBookingService(Account account) {
+    public TravelService(Account account) {
         this.account = new Account(account);
         this.routes = new ArrayList<Route>();
     }
 
-    public static FlightBookingService createFromConsole() {
-        return new FlightBookingService(Account.createFromConsole());
+    public static TravelService createFromConsole() {
+        return new TravelService(Account.createFromConsole());
     }
 
     // Метод, распечатывающий информацию обо всех доступных маршрутах.
@@ -31,8 +31,7 @@ public class FlightBookingService {
             int index = 1;
 
             for (Route route: routes) {
-                System.out.print(index++ + ". ");
-                route.printRouteInfo();
+                System.out.println(index++ + ". " + route.toString() + "\n");
             }
         }
         else {
@@ -68,6 +67,8 @@ public class FlightBookingService {
 
     // Метод, предназначенный для добавления маршрута.
     public void addRoute(Route route) {
+        if (route == null) return;
+
         for (Route rt: routes) {
             if (rt.equals(route)) {
                 System.out.println("Данный маршрут уже существует, добавление невозможно");
@@ -93,73 +94,67 @@ public class FlightBookingService {
 
     /* Метод, производящий поиск маршрутов по выбранному городу.
        Выводит список всех доступных городов, город посадки которых совпадает с выбранным. */
-    public final void searchTicketsByCity(String desired_city) {
-        boolean is_found = false;
+    public final void searchTicketsByCity(String desiredCity) {
+        boolean isFound = false;
         int index = 1;
 
         for (Route rt: routes) {
-            if (rt.getArrivalCity().equals(desired_city)) {
-                if (!is_found) {
-                    is_found = true;
-                    System.out.println("Найдены следующие маршруты до города " + desired_city + ":");
+            if (rt.getArrivalCity().equals(desiredCity)) {
+                if (!isFound) {
+                    isFound = true;
+                    System.out.println("Найдены следующие маршруты до города " + desiredCity + ":");
                 }
 
-                System.out.print(index++ + ". ");
-                rt.printRouteInfo();
+                System.out.println(index++ + ". " + rt.toString() + "\n");
             }
         }
 
-        if (!is_found) {
+        if (!isFound) {
             System.out.println("Подходящих маршрутов не найдено.");
         }
     }
 
     /* Метод, производящий поиск маршрутов по заданной цене.
        Выводит список всех доступных городов, цена билетов которых не превышает заданную. */
-    public final void searchTicketsByPrice(int available_money) {
-        boolean is_found = false;
+    public final void searchTicketsByPrice(int availableMoney) {
+        boolean isFound = false;
         int index = 1;
 
         for (Route rt: routes) {
-            if (rt.getTicketPrice() <= available_money) {
-                if (!is_found) {
-                    is_found = true;
-                    System.out.println("Найдены следующие маршруты стоимостью до " + available_money + " рублей:");
+            if (rt.getTicketPrice() <= availableMoney) {
+                if (!isFound) {
+                    isFound = true;
+                    System.out.println("Найдены следующие маршруты стоимостью до " + availableMoney + " рублей:");
                 }
 
-                System.out.print(index++ + ". ");
-                rt.printRouteInfo();
+                System.out.println(index++ + ". " + rt.toString() + "\n");
             }
         }
 
-        if (!is_found) {
+        if (!isFound) {
             System.out.println("Подходящих маршрутов не найдено.");
         }
     }
 
     // Метод, предназначенный для покупки билетов.
     public void buyTicket(Route route) {
-        if (account.getTicket() != null) {
-            System.out.println("У Вас уже куплен билет, купить еще один невозможно.\n");
-            return;
-        }
-
-        boolean is_not_enough_money = false;
+        boolean isNotEnoughMoney = false;
         for (Route rt: routes) {
             if (rt.equals(route)) {
                 if (account.getBalance() >= rt.getTicketPrice()) {
-                    account.setTicket(route);
+                    account.addTicket(route);
                     account.setBalance(account.getBalance() - rt.getTicketPrice());
+                    profit += rt.getTicketPrice();
                     System.out.println("Билет успешно куплен, на вашем счету осталось " +
                             account.getBalance() + " рублей.\n");
                     return;
                 }
             }
             else {
-                is_not_enough_money = true;
+                isNotEnoughMoney = true;
             }
         }
-        if (is_not_enough_money) {
+        if (isNotEnoughMoney) {
             System.out.println("На Вашем счету недостаточно средств для покупки билета.\n");
         }
         else {
@@ -168,20 +163,46 @@ public class FlightBookingService {
     }
 
     // Метод, предназначенный для продажи билета.
-    public void sellTicket() {
-        if (account.getTicket() != null) {
-            account.setBalance(account.getBalance() + account.getTicket().getTicketPrice());
-            account.setTicket(null);
-            System.out.println("Билет успешно продан, на Вашем счету " + account.getBalance() + " рублей.\n");
+    public void sellTicket(int desiredIndex) {
+        var tickets = account.getTickets();
+        if (desiredIndex < 1 || desiredIndex > tickets.size()) {
+            System.out.println("Введен некорректный номер купленного билета.");
+            return;
         }
+
+        if (tickets.isEmpty()) {
+            System.out.println("На Вашем аккаунте нет купленных билетов.\n");
+        }
+
         else {
-            System.out.println("На Вашем счету нет купленных билетов.\n");
+            int index = 1;
+            for (Route rt: tickets) {
+                if (index++ == desiredIndex) {
+                    account.setBalance(account.getBalance() + rt.getTicketPrice());
+                    profit -= rt.getTicketPrice();
+                    account.sellTicket(rt);
+                    break;
+                }
+            }
+            System.out.println("Билет успешно продан, на Вашем счету " + account.getBalance() + " рублей.\n");
         }
     }
 
     // Метод, распечатывающий информацию о купленном билете.
-    public final void printTicketInfo() {
-        if (account.getTicket() != null) account.getTicket().printRouteInfo();
-        else System.out.println("Билет не куплен, просмотреть информацию невозможно.");
+    public final void printTicketsInfo() {
+        var tickets = account.getTickets();
+        if (tickets.isEmpty()) {
+            System.out.println("На Вашем аккаунте нет купленных билетов.\n");
+            return;
+        }
+        int index = 1;
+
+        for (Route rt: tickets) {
+            System.out.println(index++ + ". " + rt.toString() + "\n");
+        }
+    }
+
+    public static void getCompanyProfit() {
+        System.out.println("На данный момент прибыль компании составляет " + profit + " рублей.\n");
     }
 }

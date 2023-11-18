@@ -53,16 +53,6 @@ public class Route {
         return new Route(ticketPrice, departureCity, arrivalCity, departureTime, arrivalTime);
     }
 
-    // Метод для печати информации о маршруте.
-    public final void printRouteInfo() {
-        System.out.println("Маршрут: " + departureCity + " - " + arrivalCity);
-        System.out.print("Время взлёта: ");
-        departureTime.printTimestamp();
-        System.out.print("Время посадки: ");
-        arrivalTime.printTimestamp();
-        System.out.println("Цена билета: " + ticketPrice + "\n");
-    }
-
     public final String getArrivalCity() {
         return this.arrivalCity;
     }
@@ -71,11 +61,19 @@ public class Route {
         return this.ticketPrice;
     }
 
-    // Метод, сравнивающий маршруты по полям.
     public final boolean equals(Route other) {
         return this.ticketPrice == other.ticketPrice && this.departureCity.equals(other.departureCity)
                 && this.arrivalCity.equals(other.arrivalCity) && this.departureTime.equals(other.departureTime)
                 && this.arrivalTime.equals(other.arrivalTime);
     }
 
+    @Override
+    public String toString() {
+        String str = "";
+        str += "Маршрут: " + departureCity + " - " + arrivalCity + "\n";
+        str += "Время взлёта: " + departureTime.toString() + "\n";
+        str += "Время посадки: " + arrivalTime.toString() + "\n";
+        str += "Цена билета: " + ticketPrice;
+        return str;
+    }
 }

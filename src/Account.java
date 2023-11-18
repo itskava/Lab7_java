@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Account {
@@ -6,7 +7,7 @@ public class Account {
     private String telephone;
     private int age;
     private int balance;
-    private Route ticket;
+    private ArrayList<Route> tickets;
 
     public Account(String name, String email, String telephone, int age, int balance) {
         this.name = name;
@@ -14,7 +15,7 @@ public class Account {
         this.telephone = telephone;
         this.age = age;
         this.balance = balance;
-        this.ticket = null;
+        this.tickets = new ArrayList<Route>();
     }
 
     public Account() {
@@ -23,6 +24,7 @@ public class Account {
 
     public Account(Account other) {
         this(other.name, other.email, other.telephone, other.age, other.balance);
+        this.tickets = (ArrayList<Route>)other.tickets.clone();
     }
 
     // Статический метод для создания экземпляра класса через консоль.
@@ -99,12 +101,15 @@ public class Account {
         this.balance = amount;
     }
 
-    public final Route getTicket() {
-        return this.ticket;
+    public final ArrayList<Route> getTickets() {
+        return new ArrayList<Route>(tickets);
     }
 
-    public void setTicket(Route route) {
-        if (route == null) this.ticket = null;
-        else this.ticket = new Route(route);
+    public void addTicket(Route route) {
+        tickets.add(route);
+    }
+
+    public void sellTicket(Route rt) {
+        tickets.remove(rt);
     }
 }
