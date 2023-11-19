@@ -20,7 +20,7 @@ public class Main {
         int randNum = Demo.randomInteger();
         System.out.println(randNum);
         randNum = Demo.randomInteger();
-        System.out.println(randNum);
+        System.out.println(randNum + "\n");
 
         // Демонстрация работы с классом String.
         String demo = "  some text  ";

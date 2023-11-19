@@ -80,10 +80,22 @@ public class TravelService {
     }
 
     // Метод, предназначенный для удаления маршрута.
-    public void removeRoute(Route route) {
-        for (Route rt: routes) {
-            if (rt.equals(route)) {
-                routes.remove(route);
+    public void removeRoute(int desiredIndex) {
+        var tickets = account.getTickets();
+        if (tickets.isEmpty()) {
+            System.out.println("Сейчас нет доступных маршрутов");
+        }
+
+        if (desiredIndex < 1 || desiredIndex > tickets.size()) {
+            System.out.println("Введен некорректный номер билета.");
+            return;
+        }
+
+        int index = 1;
+
+        for (Route rt: tickets) {
+            if (index++ == desiredIndex) {
+                routes.remove(rt);
                 System.out.println("Маршрут успешно удален.");
                 return;
             }
@@ -165,15 +177,14 @@ public class TravelService {
     // Метод, предназначенный для продажи билета.
     public void sellTicket(int desiredIndex) {
         var tickets = account.getTickets();
-        if (desiredIndex < 1 || desiredIndex > tickets.size()) {
-            System.out.println("Введен некорректный номер купленного билета.");
-            return;
-        }
-
         if (tickets.isEmpty()) {
             System.out.println("На Вашем аккаунте нет купленных билетов.\n");
         }
 
+        if (desiredIndex < 1 || desiredIndex > tickets.size()) {
+            System.out.println("Введен некорректный номер купленного билета.");
+            return;
+        }
         else {
             int index = 1;
             for (Route rt: tickets) {
