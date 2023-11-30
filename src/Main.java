@@ -1,38 +1,41 @@
+import java.awt.desktop.SystemSleepEvent;
+
 public class Main {
     public static void main(String[] args) {
-        TravelService ts = new TravelService(new Account("Timofey Tagaev", "timofey.tagaev.2004.12@gmail.com", "+7929323****", 18, 100000));
+        Timestamp timestamp_demo = new Timestamp(30, 11, 2022, 22, 20); // Намеренно введена дата в прошлом.
+        System.out.println(timestamp_demo.toString() + "\n");
+        timestamp_demo.changeData(30, 11, 2024, 22, 20); // Время изменено на действительное в будущем.
+        System.out.println(timestamp_demo.toString() + "\n");
 
-        // Демонстрация работы с массивом объектов.
-        Route[] routes = new Route[3];
-        routes[0] = new Route(20000, "Barnaul", "Salt Lake City", new Timestamp(18, 11, 2023, 15, 25), new Timestamp(18, 11, 2023, 20, 25));
-        routes[1] = new Route(60000, "Barnaul", "Stockholm", new Timestamp(10, 12, 2023, 12, 45), new Timestamp(11, 12, 2023, 0, 0));
-        routes[2] = new Route(40000, "Barnaul", "Moscow", new Timestamp(21, 11, 2023, 14, 0), new Timestamp(21, 11, 2023, 18, 0));
+        Account account_demo = new Account("NotFullName", "NotEmail", "NotTelephone", 5); // Намеренно записаны недействительные данные.
+        TravelService ts = new TravelService(account_demo);
+        ts.displayAccountInfo();
+        ts.changeAccountData("Totally Full Name", "totallyvalid@email.com", "+89138881122", 25); // Изменены на правильные.
+        ts.displayAccountInfo();
 
-        for (Route route: routes) ts.addRoute(route);
+        // Вывод одномерного массива экземпляров класса.
+        Timestamp[] one_dim_array = new Timestamp[] {
+                new	Timestamp(10, 12, 2023, 14, 10),
+                new Timestamp(31, 12, 2023, 23, 59),
+                new Timestamp(28, 12, 2023, 10, 10)
+        };
 
-        // Демонстрация использования статического метода.
-        TravelService.getCompanyProfit();
-        ts.buyTicket(routes[0]);
-        ts.buyTicket(routes[1]);
-        TravelService.getCompanyProfit();
-
-        // Демонстрация возврата целочисленного значения из метода вспомогательного класса.
-        int randNum = Demo.randomInteger();
-        System.out.println(randNum);
-        randNum = Demo.randomInteger();
-        System.out.println(randNum + "\n");
-
-        // Демонстрация работы с классом String.
-        String demo = "  some text  ";
-        System.out.println(demo);
-        demo = demo.trim(); // Удаление начальных и конечных пробельных символов
-        System.out.println(demo);
-        String[] split = demo.split(" "); // Разбиение строки по разделителю
-        for (String str : split) System.out.print(str + " ");
+        for (Timestamp tm: one_dim_array) {
+            System.out.println(tm.toString());
+        }
         System.out.println();
-        String cat = split[0].concat(split[1]); // Конкатенация
-        System.out.println(cat);
-        cat = cat.toUpperCase(); // Перевод всех символов в верхний регистр
-        System.out.println(cat);
+
+        Timestamp[][] two_dim_array = new Timestamp[][] {
+                { new Timestamp(10, 8, 2025, 0, 1), new Timestamp(11, 9, 2025, 1, 2) },
+                { new Timestamp(12, 10, 2025, 2, 3), new Timestamp(13, 11, 2025, 3, 4) }
+        };
+
+        // Вывод двумерного массива экземпляров класса.
+        for (Timestamp[] row: two_dim_array) {
+            for (Timestamp tm: row) {
+                System.out.print(tm.toString() + " ");
+            }
+            System.out.println();
+        }
     }
 }

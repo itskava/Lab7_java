@@ -2,29 +2,36 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Account {
-    private String name;
-    private String email;
-    private String telephone;
+    private String name = "";
+    private String email = "";
+    private String telephone = "";
     private int age;
     private int balance;
     private ArrayList<Route> tickets;
 
-    public Account(String name, String email, String telephone, int age, int balance) {
-        this.name = name;
-        this.email = email;
-        this.telephone = telephone;
-        this.age = age;
-        this.balance = balance;
-        this.tickets = new ArrayList<Route>();
+    public Account(String name, String email, String telephone, int age) {
+        try {
+            checkAccountDataCorrectness(name, email, telephone, age);
+            this.name = name;
+            this.email = email;
+            this.telephone = telephone;
+            this.age = age;
+            this.balance = 0;
+            this.tickets = new ArrayList<Route>();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("Чтобы пользоваться сервисом, пожалуйста, обновите личную информацию на действительную.");
+        }
+
     }
 
-    public Account() {
-        this("", "", "", 0, 0);
-    }
+    public Account() {}
 
     public Account(Account other) {
-        this(other.name, other.email, other.telephone, other.age, other.balance);
-        this.tickets = (ArrayList<Route>)other.tickets.clone();
+        this(other.name, other.email, other.telephone, other.age);
+        if (other.tickets != null) this.tickets = (ArrayList<Route>)other.tickets.clone();
+        else this.tickets = new ArrayList<Route>();
     }
 
     // Статический метод для создания экземпляра класса через консоль.
@@ -45,20 +52,39 @@ public class Account {
         System.out.print("Введите Ваш возраст: ");
         age = scanner.nextInt();
 
-        System.out.print("Введите сумму, на которую будет сразу пополнен Ваш счёт: ");
-        balance = scanner.nextInt();
-        scanner.nextLine();
-
-        return new Account(name, email, telephone, age, balance);
+        return new Account(name, email, telephone, age);
     }
 
-    // Метод для печати информации об аккаунте.
-    public final void printAccountInfo() {
-        System.out.println("Данные аккаунта:");
-        System.out.println("ФИО: " + name);
-        System.out.println("Возраст: " + age);
-        System.out.println("Почта: " + email);
-        System.out.println("Телефон: " + telephone + "\n");
+    protected final void checkAccountDataCorrectness(
+            String name,
+            String email,
+            String telephone,
+            int age) throws Exception
+    {
+        if (name.split(" ").length != 3)
+            throw new Exception("Вы неверно ввели ФИО.");
+        if (!checkEmailCorrectness(email))
+            throw new Exception("Вы ввели недействительный адрес электронной почты.");
+        if (telephone.charAt(0) != '+' || telephone.length() != 12)
+            throw new Exception("Вы ввели недействительный номер телефона.");
+        if (age < 18)
+            throw new Exception("Чтобы создать аккаунт, вам должно быть как минимум 18 лет.");
+        if (age > 99)
+            throw new Exception("Вы ввели недействительный возраст.");
+    }
+
+    protected boolean checkEmailCorrectness(String email) {
+        boolean emailCorrectness = true;
+        if (!email.contains("@")) emailCorrectness = false;
+        else if (!email.contains(".")) emailCorrectness = false;
+        else if (email.contains("@.")) emailCorrectness = false;
+        else if (email.charAt(0) == '@' || email.charAt(email.length() - 1) == '.') emailCorrectness = false;
+
+        return emailCorrectness;
+    }
+
+    protected final boolean isInitialized() {
+        return !name.isEmpty() && !email.isEmpty() && telephone != null && age != 0;
     }
 
     public final String getName() {

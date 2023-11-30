@@ -6,17 +6,22 @@ public class TravelService {
     private static long profit;
 
     public TravelService(String name, String email, String telephone, int age, int balance) {
-        this.account = new Account(name, email, telephone, age, balance);
+        this.account = new Account(name, email, telephone, age);
         this.routes = new ArrayList<Route>();
     }
 
     public TravelService() {
-        this.account = new Account("", "", "", 0, 0);
+        this.account = new Account("", "", "", 0);
         this.routes = new ArrayList<Route>();
     }
 
     public TravelService(Account account) {
-        this.account = new Account(account);
+        this.account = new Account();
+        this.account.setName(account.getName());
+        this.account.setEmail(account.getEmail());
+        this.account.setTelephone(account.getTelephone());
+        this.account.setAge(account.getAge());
+        this.account.setBalance(0);
         this.routes = new ArrayList<Route>();
     }
 
@@ -25,7 +30,7 @@ public class TravelService {
     }
 
     // Метод, распечатывающий информацию обо всех доступных маршрутах.
-    public final void printAvailableRoutes() {
+    public final void displayAvailableRoutes() {
         if (!routes.isEmpty()) {
             System.out.println("Доступные маршруты:\n");
             int index = 1;
@@ -39,19 +44,30 @@ public class TravelService {
         }
     }
 
-    // Метод, распечатывающий информацию об аккаунте.
-    public final void printAccountInfo() {
-        account.printAccountInfo();
+    // Метод, предназначенный для вывода информации о профиле.
+    public final void displayAccountInfo() {
+        System.out.println("Данные аккаунта:");
+        System.out.println("ФИО: " + account.getName());
+        System.out.println("Возраст: " + account.getAge());
+        System.out.println("Электронная почта: " + account.getEmail());
+        System.out.println("Контактный телефон: " + account.getTelephone() + "\n");
     }
 
     // Метод, предназначенный для изменения данных аккаунта.
-    public void changeAccountInfo(String name, String email, String telephone, int age) {
-        account.setName(name);
-        account.setEmail(email);
-        account.setTelephone(telephone);
-        account.setAge(age);
+    public void changeAccountData(String name, String email, String telephone, int age) {
+        try {
+            account.checkAccountDataCorrectness(name, email, telephone, age);
+            account.setName(name);
+            account.setEmail(email);
+            account.setTelephone(telephone);
+            account.setAge(age);
 
-        System.out.println("Учетные данные Вашего аккаунта успешно изменены.\n");
+            System.out.println("Информация об аккаунте успешно изменена.\n");
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("Пожалуйста, повторите попытку.");
+        }
     }
 
     public final int getBalance() {
@@ -150,6 +166,11 @@ public class TravelService {
 
     // Метод, предназначенный для покупки билетов.
     public void buyTicket(Route route) {
+        if (!account.isInitialized()) {
+            System.out.println("Ваш аккаунт не инициализирован. Пожалуйста, обновите информацию профиля.");
+            return;
+        }
+
         boolean isNotEnoughMoney = false;
         for (Route rt: routes) {
             if (rt.equals(route)) {
@@ -176,6 +197,11 @@ public class TravelService {
 
     // Метод, предназначенный для продажи билета.
     public void sellTicket(int desiredIndex) {
+        if (!account.isInitialized()) {
+            System.out.println("Ваш аккаунт не инициализирован. Пожалуйста, обновите информацию профиля.");
+            return;
+        }
+
         var tickets = account.getTickets();
         if (tickets.isEmpty()) {
             System.out.println("На Вашем аккаунте нет купленных билетов.\n");
