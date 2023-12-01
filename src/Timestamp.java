@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.time.LocalTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,5 +1,3 @@
-import java.awt.desktop.SystemSleepEvent;
-
 public class Main {
     public static void main(String[] args) {
         Timestamp timestamp_demo = new Timestamp(30, 11, 2022, 22, 20); // Намеренно введена дата в прошлом.
