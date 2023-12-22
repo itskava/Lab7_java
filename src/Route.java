@@ -1,35 +1,38 @@
 import java.util.Scanner;
 
-public class Route {
+public class Route<T> implements Cloneable, AdditionalInfoSupportable {
     private int ticketPrice;
     private String departureCity;
     private String arrivalCity;
     private Timestamp departureTime;
     private Timestamp arrivalTime;
+    private T additionalInfo;
 
     public Route(int ticketPrice,
                  String departureCity,
                  String arrivalCity,
                  Timestamp departureTime,
-                 Timestamp arrivalTime)
+                 Timestamp arrivalTime,
+                 T additionalInfo)
     {
         this.ticketPrice = ticketPrice;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
+        this.additionalInfo = additionalInfo;
     }
 
     public Route() {
-        this(0, "", "", new Timestamp(), new Timestamp());
+        this(0, "", "", new Timestamp(), new Timestamp(), null);
     }
 
-    public Route(Route other) {
-        this(other.ticketPrice, other.departureCity, other.arrivalCity, other.departureTime, other.arrivalTime);
+    public Route(Route<T> other) {
+        this(other.ticketPrice, other.departureCity, other.arrivalCity, other.departureTime, other.arrivalTime, null);
     }
 
     // Статический метод для создания экземляра класса через консоль.
-    public static Route createFromConsole() {
+    public static Route<String> createFromConsole() {
         Scanner scanner = new Scanner(System.in);
 
         int ticketPrice;
@@ -50,7 +53,8 @@ public class Route {
         System.out.println("Для посадки: ");
         Timestamp arrivalTime = Timestamp.createFromConsole();
 
-        return new Route(ticketPrice, departureCity, arrivalCity, departureTime, arrivalTime);
+
+        return new Route<String>(ticketPrice, departureCity, arrivalCity, departureTime, arrivalTime, null);
     }
 
     public final String getArrivalCity() {
@@ -61,10 +65,28 @@ public class Route {
         return this.ticketPrice;
     }
 
-    public final boolean equals(Route other) {
+    public final boolean equals(Route<T> other) {
         return this.ticketPrice == other.ticketPrice && this.departureCity.equals(other.departureCity)
                 && this.arrivalCity.equals(other.arrivalCity) && this.departureTime.equals(other.departureTime)
                 && this.arrivalTime.equals(other.arrivalTime);
+    }
+
+    public final void displayAdditionalInfo() {
+        if (additionalInfo != null) {
+            System.out.println(additionalInfo.toString());
+        }
+        else {
+            System.out.println("Для данного маршрута нет дополнительной информации.");
+        }
+    }
+
+    public final void setAdditionalInfo(Object additionalInfo) {
+        this.additionalInfo = (T)additionalInfo;
+        System.out.println("Дополнительная информация успешно обновлена.");
+    }
+
+    public T getAdditionalInfo() {
+        return additionalInfo;
     }
 
     @Override
@@ -75,5 +97,10 @@ public class Route {
         str += "Время посадки: " + arrivalTime.toString() + "\n";
         str += "Цена билета: " + ticketPrice;
         return str;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

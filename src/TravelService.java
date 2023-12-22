@@ -1,32 +1,40 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class TravelService {
-    private ArrayList<Route> routes;
+    private ArrayList<Route<String>> routes;
     private Account account;
     private static long profit;
 
-    public TravelService(String name, String email, String telephone, int age, int balance) {
-        this.account = new Account(name, email, telephone, age);
-        this.routes = new ArrayList<Route>();
+    public TravelService(String name, String email, String telephone, int age) {
+        this.account = new BaseAccount(name, email, telephone, age);
+        this.routes = new ArrayList<Route<String>>();
     }
 
-    public TravelService() {
-        this.account = new Account("", "", "", 0);
-        this.routes = new ArrayList<Route>();
+    public TravelService() throws IllegalArgumentException {
+        this.account = new BaseAccount("", "", "", 0);
+        this.routes = new ArrayList<Route<String>>();
     }
 
-    public TravelService(Account account) {
-        this.account = new Account();
-        this.account.setName(account.getName());
-        this.account.setEmail(account.getEmail());
-        this.account.setTelephone(account.getTelephone());
-        this.account.setAge(account.getAge());
-        this.account.setBalance(0);
-        this.routes = new ArrayList<Route>();
+    public TravelService(Account account)   {
+        if (account instanceof BaseAccount || account instanceof PremiumAccount) {
+            if (account instanceof BaseAccount) this.account = new BaseAccount(account);
+            else  this.account = new PremiumAccount();
+            this.account.setName(account.getName());
+            this.account.setEmail(account.getEmail());
+            this.account.setTelephone(account.getTelephone());
+            this.account.setAge(account.getAge());
+            this.account.setBalance(0);
+            this.routes = new ArrayList<Route<String>>();
+        }
+        else {
+            throw new IllegalArgumentException("Недопустимый параметр.");
+        }
+
     }
 
     public static TravelService createFromConsole() {
-        return new TravelService(Account.createFromConsole());
+        return new TravelService(BaseAccount.createFromConsole());
     }
 
     // Метод, распечатывающий информацию обо всех доступных маршрутах.
@@ -35,7 +43,7 @@ public class TravelService {
             System.out.println("Доступные маршруты:\n");
             int index = 1;
 
-            for (Route route: routes) {
+            for (Route<String> route: routes) {
                 System.out.println(index++ + ". " + route.toString() + "\n");
             }
         }
@@ -46,11 +54,7 @@ public class TravelService {
 
     // Метод, предназначенный для вывода информации о профиле.
     public final void displayAccountInfo() {
-        System.out.println("Данные аккаунта:");
-        System.out.println("ФИО: " + account.getName());
-        System.out.println("Возраст: " + account.getAge());
-        System.out.println("Электронная почта: " + account.getEmail());
-        System.out.println("Контактный телефон: " + account.getTelephone() + "\n");
+        account.displayAccountInfo();
     }
 
     // Метод, предназначенный для изменения данных аккаунта.
@@ -82,10 +86,10 @@ public class TravelService {
     }
 
     // Метод, предназначенный для добавления маршрута.
-    public void addRoute(Route route) {
+    public void addRoute(Route<String> route) {
         if (route == null) return;
 
-        for (Route rt: routes) {
+        for (Route<String> rt: routes) {
             if (rt.equals(route)) {
                 System.out.println("Данный маршрут уже существует, добавление невозможно");
                 return;
@@ -109,7 +113,7 @@ public class TravelService {
 
         int index = 1;
 
-        for (Route rt: tickets) {
+        for (Route<String> rt: tickets) {
             if (index++ == desiredIndex) {
                 routes.remove(rt);
                 System.out.println("Маршрут успешно удален.");
@@ -126,7 +130,7 @@ public class TravelService {
         boolean isFound = false;
         int index = 1;
 
-        for (Route rt: routes) {
+        for (Route<String> rt: routes) {
             if (rt.getArrivalCity().equals(desiredCity)) {
                 if (!isFound) {
                     isFound = true;
@@ -148,7 +152,7 @@ public class TravelService {
         boolean isFound = false;
         int index = 1;
 
-        for (Route rt: routes) {
+        for (Route<String> rt: routes) {
             if (rt.getTicketPrice() <= availableMoney) {
                 if (!isFound) {
                     isFound = true;
@@ -165,26 +169,57 @@ public class TravelService {
     }
 
     // Метод, предназначенный для покупки билетов.
-    public void buyTicket(Route route) {
+    public void buyTicket(Route<String> route) {
         if (!account.isInitialized()) {
             System.out.println("Ваш аккаунт не инициализирован. Пожалуйста, обновите информацию профиля.");
             return;
         }
 
         boolean isNotEnoughMoney = false;
-        for (Route rt: routes) {
+        for (Route<String> rt: routes) {
             if (rt.equals(route)) {
-                if (account.getBalance() >= rt.getTicketPrice()) {
-                    account.addTicket(route);
-                    account.setBalance(account.getBalance() - rt.getTicketPrice());
-                    profit += rt.getTicketPrice();
-                    System.out.println("Билет успешно куплен, на вашем счету осталось " +
-                            account.getBalance() + " рублей.\n");
-                    return;
+                int price = rt.getTicketPrice();
+                if (account instanceof BaseAccount) {
+                    if (account.getBalance() >= price) {
+                        account.addTicket(route);
+                        account.setBalance(account.getBalance() - price);
+                        profit += price;
+                        System.out.println("Билет успешно куплен, на вашем счету осталось " +
+                                account.getBalance() + " рублей.\n");
+                        return;
+                    }
+                    else {
+                        isNotEnoughMoney = true;
+                    }
                 }
-            }
-            else {
-                isNotEnoughMoney = true;
+                else {
+                    PremiumAccount premAcc = (PremiumAccount)account;
+                    if (account.balance + premAcc.bonuses >= price) {
+                        int newBonuses = premAcc.calculateBonuses(price);
+
+                        if (price >= premAcc.bonuses) {
+                            int ticketPrice = price;
+                            ticketPrice -= premAcc.bonuses;
+                            premAcc.bonuses = 0;
+                            premAcc.balance -= ticketPrice;
+                        }
+                        else {
+                            premAcc.balance -= price;
+                        }
+
+                        premAcc.bonuses += newBonuses;
+
+                        System.out.println("Билет успешно куплен, на счету осталось " +
+                                premAcc.balance + " рублей и " + premAcc.bonuses +
+                                " бонусов.\n");
+
+                        account = premAcc;
+                        return;
+                    }
+                    else {
+                        isNotEnoughMoney = true;
+                    }
+                }
             }
         }
         if (isNotEnoughMoney) {
@@ -213,7 +248,7 @@ public class TravelService {
         }
         else {
             int index = 1;
-            for (Route rt: tickets) {
+            for (Route<String> rt: tickets) {
                 if (index++ == desiredIndex) {
                     account.setBalance(account.getBalance() + rt.getTicketPrice());
                     profit -= rt.getTicketPrice();
@@ -234,12 +269,35 @@ public class TravelService {
         }
         int index = 1;
 
-        for (Route rt: tickets) {
+        for (Route<String> rt: tickets) {
             System.out.println(index++ + ". " + rt.toString() + "\n");
         }
     }
 
     public static void getCompanyProfit() {
         System.out.println("На данный момент прибыль компании составляет " + profit + " рублей.\n");
+    }
+
+    public void upgradeToPremium() {
+        if (account instanceof BaseAccount) {
+            if (account.balance >= 2000) {
+                PremiumAccount newAccount = new PremiumAccount();
+
+                newAccount.name = account.name;
+                newAccount.email = account.email;
+                newAccount.telephone = account.telephone;
+                newAccount.age = account.age;
+                newAccount.balance = account.balance - 2000;
+                newAccount.bonuses = 0;
+
+                account = newAccount;
+            }
+            else {
+                System.out.println("На вашем аккаунте недостаточно средств, чтобы получить премиум-аккаунт.");
+            }
+        }
+        else {
+            System.out.println("У вас уже куплен премиум-аккаунт.");
+        }
     }
 }

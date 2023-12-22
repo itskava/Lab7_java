@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Account {
-    private String name = "";
-    private String email = "";
-    private String telephone = "";
-    private int age;
-    private int balance;
-    private ArrayList<Route> tickets;
+public abstract class Account {
+    protected String name = "";
+    protected String email = "";
+    protected String telephone = "";
+    protected int age;
+    protected int balance;
+    protected ArrayList<Route<String>> tickets;
 
     public Account(String name, String email, String telephone, int age) {
         try {
@@ -17,7 +17,7 @@ public class Account {
             this.telephone = telephone;
             this.age = age;
             this.balance = 0;
-            this.tickets = new ArrayList<Route>();
+            this.tickets = new ArrayList<Route<String>>();
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -27,33 +27,6 @@ public class Account {
     }
 
     public Account() {}
-
-    public Account(Account other) {
-        this(other.name, other.email, other.telephone, other.age);
-        if (other.tickets != null) this.tickets = (ArrayList<Route>)other.tickets.clone();
-        else this.tickets = new ArrayList<Route>();
-    }
-
-    // Статический метод для создания экземпляра класса через консоль.
-    public static Account createFromConsole() {
-        Scanner scanner = new Scanner(System.in);
-        String name, email, telephone;
-
-        System.out.print("Введите Ваше ФИО: ");
-        name = scanner.nextLine();
-
-        System.out.print("Введите Вашу почту: ");
-        email = scanner.nextLine();
-
-        System.out.print("Введите Ваш телефон: ");
-        telephone = scanner.nextLine();
-
-        int age, balance;
-        System.out.print("Введите Ваш возраст: ");
-        age = scanner.nextInt();
-
-        return new Account(name, email, telephone, age);
-    }
 
     protected final void checkAccountDataCorrectness(
             String name,
@@ -85,6 +58,16 @@ public class Account {
 
     protected final boolean isInitialized() {
         return !name.isEmpty() && !email.isEmpty() && telephone != null && age != 0;
+    }
+
+    public abstract void displayAccountInfo();
+
+    public void overloadWithoutCall() {
+        System.out.println("Account.overloadWithoutCall()");
+    }
+
+    public void overloadWithCall() {
+        System.out.print("Account.overloadWithCall()");
     }
 
     public final String getName() {
@@ -127,15 +110,15 @@ public class Account {
         this.balance = amount;
     }
 
-    public final ArrayList<Route> getTickets() {
-        return new ArrayList<Route>(tickets);
+    public final ArrayList<Route<String>> getTickets() {
+        return new ArrayList<Route<String>>(tickets);
     }
 
-    public void addTicket(Route route) {
+    public void addTicket(Route<String> route) {
         tickets.add(route);
     }
 
-    public void sellTicket(Route rt) {
+    public void sellTicket(Route<String> rt) {
         tickets.remove(rt);
     }
 }

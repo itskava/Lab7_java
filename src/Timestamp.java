@@ -3,7 +3,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Timestamp {
+public class Timestamp implements Cloneable {
     private int day;
     private int month;
     private int year;
@@ -32,9 +32,7 @@ public class Timestamp {
 
     }
 
-    public Timestamp() {
-        this(1, 1, 1970, 0, 0);
-    }
+    public Timestamp() { setDefault(); }
 
     public Timestamp(Timestamp other) {
         this(other.day, other.month, other.year, other.hour, other.minute);
@@ -171,5 +169,10 @@ public class Timestamp {
         if (minute < 10) str += "0";
         str += minute;
         return str;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
