@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class TravelService {
@@ -89,11 +91,9 @@ public class TravelService {
     public void addRoute(Route<String> route) {
         if (route == null) return;
 
-        for (Route<String> rt: routes) {
-            if (rt.equals(route)) {
-                System.out.println("Данный маршрут уже существует, добавление невозможно");
-                return;
-            }
+        if (routes.contains(route)) {
+            System.out.println("Данный маршрут уже существует, добавление невозможно");
+            return;
         }
         routes.add(route);
         System.out.println("Маршрут успешно добавлен.");
@@ -168,6 +168,11 @@ public class TravelService {
         }
     }
 
+    public void sortTicketsByPrice() {
+        routes.sort(Comparator.comparingInt(Route::getTicketPrice));
+        System.out.println("Билеты успешно отсортированы.");
+    }
+
     // Метод, предназначенный для покупки билетов.
     public void buyTicket(Route<String> route) {
         if (!account.isInitialized()) {
@@ -176,52 +181,51 @@ public class TravelService {
         }
 
         boolean isNotEnoughMoney = false;
-        for (Route<String> rt: routes) {
-            if (rt.equals(route)) {
-                int price = rt.getTicketPrice();
-                if (account instanceof BaseAccount) {
-                    if (account.getBalance() >= price) {
-                        account.addTicket(route);
-                        account.setBalance(account.getBalance() - price);
-                        profit += price;
-                        System.out.println("Билет успешно куплен, на вашем счету осталось " +
-                                account.getBalance() + " рублей.\n");
-                        return;
-                    }
-                    else {
-                        isNotEnoughMoney = true;
-                    }
+        if (routes.contains(route)) {
+            int price = route.getTicketPrice();
+            if (account instanceof BaseAccount) {
+                if (account.getBalance() >= price) {
+                    account.addTicket(route);
+                    account.setBalance(account.getBalance() - price);
+                    profit += price;
+                    System.out.println("Билет успешно куплен, на вашем счету осталось " +
+                            account.getBalance() + " рублей.\n");
+                    return;
                 }
                 else {
-                    PremiumAccount premAcc = (PremiumAccount)account;
-                    if (account.balance + premAcc.bonuses >= price) {
-                        int newBonuses = premAcc.calculateBonuses(price);
+                    isNotEnoughMoney = true;
+                }
+            }
+            else {
+                PremiumAccount premAcc = (PremiumAccount)account;
+                if (account.balance + premAcc.bonuses >= price) {
+                    int newBonuses = premAcc.calculateBonuses(price);
 
-                        if (price >= premAcc.bonuses) {
-                            int ticketPrice = price;
-                            ticketPrice -= premAcc.bonuses;
-                            premAcc.bonuses = 0;
-                            premAcc.balance -= ticketPrice;
-                        }
-                        else {
-                            premAcc.balance -= price;
-                        }
-
-                        premAcc.bonuses += newBonuses;
-
-                        System.out.println("Билет успешно куплен, на счету осталось " +
-                                premAcc.balance + " рублей и " + premAcc.bonuses +
-                                " бонусов.\n");
-
-                        account = premAcc;
-                        return;
+                    if (price >= premAcc.bonuses) {
+                        int ticketPrice = price;
+                        ticketPrice -= premAcc.bonuses;
+                        premAcc.bonuses = 0;
+                        premAcc.balance -= ticketPrice;
                     }
                     else {
-                        isNotEnoughMoney = true;
+                        premAcc.balance -= price;
                     }
+
+                    premAcc.bonuses += newBonuses;
+
+                    System.out.println("Билет успешно куплен, на счету осталось " +
+                            premAcc.balance + " рублей и " + premAcc.bonuses +
+                            " бонусов.\n");
+
+                    account = premAcc;
+                    return;
+                }
+                else {
+                    isNotEnoughMoney = true;
                 }
             }
         }
+
         if (isNotEnoughMoney) {
             System.out.println("На Вашем счету недостаточно средств для покупки билета.\n");
         }
